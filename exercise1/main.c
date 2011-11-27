@@ -29,5 +29,16 @@ int main(int argc, char *argv[])
 	printf("Calculation Completed... [%.6lf] \n", t2-t1);
 	printf("A[120]:%f\n",A[120]);
 
+	vectors * vec=malloc(sizeof(vectors));
+	init_vectors(vec, 1000, 50);
+
+	//vector_loop_func(vec, 10, 900);
+	t1=return_time();
+	pthread_execute_loop(vector_loop_func,(void *)vec, policy,chunk,num_of_threads,10,900);
+	t2=return_time();
+	
+	printf("Calculation Completed... [%.6lf] \n", t2-t1);
+	printf("A:%d+B:%d=C:%d\n",vec->A[200],vec->B[200],vec->C[200]);
+
 	return 0;
 }

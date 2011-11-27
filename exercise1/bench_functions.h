@@ -20,6 +20,8 @@ typedef struct
 
 void vector_loop_func(void * arg, int low, int high);
 
+void init_vectors(void * arg, int size, int range);
+
 /*struct holding secs and microsecs. used by the time functions*/
 struct timeval tm;
 

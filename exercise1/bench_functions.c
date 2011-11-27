@@ -39,8 +39,28 @@ void vector_loop_func(void * arg, int low, int high)
 	for(loop_counter=low;loop_counter<=high;loop_counter++)
 	{
 		v->C[loop_counter]=v->A[loop_counter]+v->B[loop_counter];
+		comp(20);
 	}
 
+}
+
+void init_vectors(void * arg, int size, int range)
+{
+	srand ( (unsigned)time(NULL) );
+
+	vectors * v = (vectors*) arg;
+	int i;
+
+	v->A = malloc(size * sizeof(int *));
+	v->B = malloc(size * sizeof(int *));
+	v->C = malloc(size * sizeof(int *));
+
+	for(i=0;i<size;i++)
+	{
+		v->A[i]=rand()%range +1;
+		v->B[i]=rand()%range +1;
+		v->C[i]=0;
+	}
 }
 
 double return_time(void)
