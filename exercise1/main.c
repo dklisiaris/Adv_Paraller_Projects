@@ -18,12 +18,6 @@ int main(int argc, char *argv[])
 	}
 	
 	system("clear");
-	//loop_func(1,10);
-	int t=10;
-	int *p=&t;
-	
-	//pthread_execute_loop(loop_func,(void *) p, STATIC,-1,4,20,30);
-	//printf("t: %d\n",t);
 
 	double A[1500];
 	//ploop_func((void*)A,100,200);

@@ -7,11 +7,11 @@ int pthread_execute_loop(void (*func)(void *arg, int low, int high),void *arg, i
 
 	pthread_t thread[nthreads];//definition of threads	
 	int i,j;
+	pthread_data * pt_data;
+	dynamic_pthread_data * dpt_data;
 
 	if(policy==STATIC)
-	{
-		pthread_data * pt_data;	
-
+	{			
 		/*allocate some memory for the thread structs*/
 		pt_data=malloc(nthreads * (sizeof(pthread_data)));
 		if(pt_data==NULL)
@@ -31,7 +31,6 @@ int pthread_execute_loop(void (*func)(void *arg, int low, int high),void *arg, i
 
 	else if(policy==DYNAMIC)
 	{	
-		dynamic_pthread_data * dpt_data;
 		dpt_data=malloc(nthreads * sizeof(dynamic_pthread_data));
 
 		pthread_mutex_init(&mutex, NULL);
@@ -51,7 +50,8 @@ int pthread_execute_loop(void (*func)(void *arg, int low, int high),void *arg, i
 		pthread_join(thread[j], NULL);
 	}
 
-	//func(low,high);
+	if(policy==STATIC)free(pt_data);
+	else if(policy==DYNAMIC)free(dpt_data);
 	return 0;
 }
 
