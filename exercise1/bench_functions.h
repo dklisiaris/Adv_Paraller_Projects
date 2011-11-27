@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>			/* header file for time functions*/
 #include <sys/time.h>		/* header file for time functions*/
+#include <math.h>
 
 void loop_func(void *arg, int start, int stop);
 
@@ -23,5 +24,9 @@ void vector_loop_func(void * arg, int low, int high);
 struct timeval tm;
 
 double return_time(void);
+
+void one_milli(void);
+
+void comp(int millis);
 
 #endif
