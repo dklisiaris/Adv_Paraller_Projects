@@ -4,7 +4,7 @@ CC = gcc
 files = bench_functions.c loop.c main.c
 objects = bench_functions.o loop.o main.o
 LIBS = -lm -pthread -g
-OUTEXEC = outexec
+OUTEXEC = bench
 
 CFLAGS = -W -Wall -Wextra
 
