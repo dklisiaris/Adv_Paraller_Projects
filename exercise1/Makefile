@@ -27,7 +27,7 @@ loop.o: loop.c loop.h
 .PHONY: clean
 clean:
 	@echo "all *.o *.out *~ files will be deleted !!!"
-	rm -f *.o *.out *~
+	rm -f *.o *.out *~ bench
 
 .PHONY: clean_all
 clean_all:
