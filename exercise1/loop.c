@@ -1,32 +1,48 @@
 #include "loop.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <errno.h>
 
-
-int pthread_execute_loop(void (*func)(void *arg, int low, int high),void *arg, int nthreads, int low, int high)
+int pthread_execute_loop(void (*func)(void *arg, int low, int high),void *arg, int policy, int chunk, int nthreads, int low, int high)
 {
-	if(nthreads<1)return EINVAL;
+	if(nthreads<1 || (policy!=STATIC && policy!=DYNAMIC))return EINVAL;
+	if(chunk==-1)chunk=1;
 
-	pthread_data * pt_data;	
+	pthread_t thread[nthreads];//definition of threads	
+	int i,j;
 
-	/*allocate some memory for the thread structs*/
-	pt_data=malloc(nthreads * (sizeof(pthread_data)));
-	if(pt_data==NULL)
+	if(policy==STATIC)
 	{
-		fprintf(stderr, "out of memory\n");
-		exit(1);
+		pthread_data * pt_data;	
+
+		/*allocate some memory for the thread structs*/
+		pt_data=malloc(nthreads * (sizeof(pthread_data)));
+		if(pt_data==NULL)
+		{
+			fprintf(stderr, "out of memory\n");
+			exit(1);
+		}
+
+		set_up_pthread_data(func, arg, pt_data, nthreads, low, high);
+
+		/*create the #nthreads threads with  and pt_data struct as argument*/
+		for(i=0;i<nthreads;i++)
+		{
+			pthread_create(&thread[i],NULL, (void*) &stat_pfunc,(void*)&pt_data[i]);
+		}
 	}
 
-	set_up_pthread_data(func, arg, pt_data, nthreads, low, high);
-	pthread_t thread[nthreads];//definition of threads
+	else if(policy==DYNAMIC)
+	{	
+		dynamic_pthread_data * dpt_data;
+		dpt_data=malloc(nthreads * sizeof(dynamic_pthread_data));
 
-	int i,j;
-	/*create the #nthreads threads with  and pt_info struct as argument*/
-	for(i=0;i<nthreads;i++)
-	{
-		pthread_create(&thread[i],NULL, (void*) &stat_pfunc,(void*)&pt_data[i]);
+		pthread_mutex_init(&mutex, NULL);
+
+		set_up_dynamic_pthread_data(func, arg, dpt_data, chunk, nthreads, low, high);
+
+		/*create the #nthreads threads with  and pt_data struct as argument*/
+		for(i=0;i<nthreads;i++)
+		{
+			pthread_create(&thread[i],NULL, (void*) &dyn_pfunc,(void*)&dpt_data[i]);
+		}
 	}
 	
 	/*join threads when they are finished*/
@@ -64,6 +80,20 @@ void set_up_pthread_data(void(*func)(void *arg,int low,int high),void *arg, pthr
 	}
 }
 
+void set_up_dynamic_pthread_data
+	(void(*func)(void *arg,int low,int high),void *arg, dynamic_pthread_data *dpd,int chunk, int nthreads, int init_low,int init_high)
+{
+	int i;
+	for(i=0;i<nthreads;i++)
+	{
+		dpd[i].global_high=init_high;
+		dpd[i].func=func;
+		dpd[i].f_arg=arg;
+		dpd[i].chunk=chunk;
+		dpd[i].chunk_counter=&init_low;
+	}
+}
+
 void stat_pfunc(void * arg)
 {
 	pthread_data * pd = (pthread_data *)arg;
@@ -72,4 +102,29 @@ void stat_pfunc(void * arg)
 	func(pd->f_arg, pd->low, pd->high);
 
 }
+
+void dyn_pfunc(void * arg)
+{
+	dynamic_pthread_data * dpd = (dynamic_pthread_data *)arg;
+	int start,end;
+	void (*func)(void*,int,int);
+	func=dpd->func;
+	while(*(dpd->chunk_counter)<dpd->global_high)
+	{
+		pthread_mutex_lock(&mutex);
+		if(*(dpd->chunk_counter)>dpd->global_high)
+		{
+			pthread_mutex_unlock(&mutex);
+			break;
+		}
+		start=*(dpd->chunk_counter);
+		end=start+dpd->chunk;
+		*(dpd->chunk_counter)=end+1;
+		if(*(dpd->chunk_counter)>dpd->global_high)end=dpd->global_high;
+		pthread_mutex_unlock(&mutex);
+
+		func(dpd->f_arg, start, end);
+	}
+}
+
 
