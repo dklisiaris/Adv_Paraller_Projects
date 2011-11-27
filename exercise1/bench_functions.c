@@ -1,6 +1,4 @@
 #include "bench_functions.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 /* Loop test functions*/
 
@@ -41,5 +39,12 @@ void vector_loop_func(void * arg, int low, int high)
 	{
 		v->C[loop_counter]=v->A[loop_counter]+v->B[loop_counter];
 	}
+}
 
+double return_time(void)
+{
+	gettimeofday(&tm, NULL);
+	double time=tm.tv_sec+(tm.tv_usec/1000000.0);
+	
+	return time;
 }

@@ -1,6 +1,11 @@
 #ifndef BENCH_FUNCTIONS_H
 #define BENCH_FUNCTIONS_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>			/* header file for time functions*/
+#include <sys/time.h>		/* header file for time functions*/
+
 void loop_func(void *arg, int start, int stop);
 
 void ploop_func(void *arg, int low, int high);
@@ -13,5 +18,10 @@ typedef struct
 }vectors;
 
 void vector_loop_func(void * arg, int low, int high);
+
+/*struct holding secs and microsecs. used by the time functions*/
+struct timeval tm;
+
+double return_time(void);
 
 #endif
