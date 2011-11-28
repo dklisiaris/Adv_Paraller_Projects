@@ -2,7 +2,7 @@
 
 /* Loop test functions*/
 
-/*a very simple function to start with. Must be called with NULL arg*/
+/*a very simple function to start with.*/
 void loop_func(void *arg, int start, int stop)
 {
 	int * test_pt=(int *)arg;
@@ -44,17 +44,18 @@ void vector_loop_func(void * arg, int low, int high)
 
 }
 
+/*initializes the vectors with random values in order to be used in addtion*/
 void init_vectors(void * arg, int size, int range)
 {
 	srand ( (unsigned)time(NULL) );
 
 	vectors * v = (vectors*) arg;
 	int i;
-
+	/*allocate memory for each vector*/
 	v->A = malloc(size * sizeof(int *));
 	v->B = malloc(size * sizeof(int *));
 	v->C = malloc(size * sizeof(int *));
-
+	/* give random values*/
 	for(i=0;i<size;i++)
 	{
 		v->A[i]=rand()%range +1;
@@ -63,6 +64,7 @@ void init_vectors(void * arg, int size, int range)
 	}
 }
 
+/*returns the current time*/
 double return_time(void)
 {
 	gettimeofday(&tm, NULL);

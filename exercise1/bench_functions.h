@@ -11,6 +11,7 @@ void loop_func(void *arg, int start, int stop);
 
 void ploop_func(void *arg, int low, int high);
 
+/*struct holding pointers to three integers. Will be used to create arrays*/
 typedef struct
 {
 	int *A;
